@@ -101,7 +101,7 @@ export async function attemptCompletionTool(
 
 			toolResults.push({
 				type: "text",
-				text: `The user has provided feedback on the results. Consider their input to continue the task, and then attempt completion again.\n<feedback>\n${text}\n</feedback>`,
+				text: `用户已对结果提供反馈。请考虑他们的意见继续执行任务，然后再次尝试使用 attempt_completion.\n<feedback>\n${text}\n</feedback>`,
 			})
 
 			toolResults.push(...formatResponse.imageBlocks(images))
