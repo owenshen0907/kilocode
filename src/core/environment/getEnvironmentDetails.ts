@@ -170,8 +170,7 @@ export async function getEnvironmentDetails(cline: Task, includeFileDetails: boo
 	const recentlyModifiedFiles = cline.fileContextTracker.getAndClearRecentlyModifiedFiles()
 
 	if (recentlyModifiedFiles.length > 0) {
-		details +=
-			"\n\n# Recently Modified Files\nThese files have been modified since you last accessed them (file was just edited so you may need to re-read it before editing):"
+		details += "\n\n# 最近修改的文件这些文件自您上次访问后已被修改（文件刚被编辑，因此在编辑前可能需要重新读取）:"
 		for (const filePath of recentlyModifiedFiles) {
 			details += `\n${filePath}`
 		}
@@ -200,7 +199,7 @@ export async function getEnvironmentDetails(cline: Task, includeFileDetails: boo
 	const timeZoneOffsetMinutes = Math.abs(Math.round((Math.abs(timeZoneOffset) - timeZoneOffsetHours) * 60))
 	const timeZoneOffsetStr = `${timeZoneOffset >= 0 ? "+" : "-"}${timeZoneOffsetHours}:${timeZoneOffsetMinutes.toString().padStart(2, "0")}`
 	// kilocode_change: time in ISO format
-	details += `\n\n# Current Time\nCurrent time in ISO 8601 UTC format: ${now.toISOString()}\nUser time zone: ${timeZone}, UTC${timeZoneOffsetStr}`
+	details += `\n\n# 当前时间\n当前时间以 ISO 8601 UTC 格式显示当前时间: ${now.toISOString()}\n用户时区: ${timeZone}, UTC${timeZoneOffsetStr}`
 
 	// Add context tokens information.
 	const { contextTokens, totalCost } = getApiMetrics(cline.clineMessages)

@@ -6,71 +6,68 @@ import { RooProtectedController } from "../protect/RooProtectedController"
 
 export const formatResponse = {
 	duplicateFileReadNotice: () =>
-		`[[NOTE] This file read has been removed to save space in the context window. Refer to the latest file read for the most up to date version of this file.]`,
+		`[[注意] 为节省上下文窗口空间，此次文件读取已被移除。请参考最新的文件读取以获取此文件的最新版本。]`,
 
 	contextTruncationNotice: () =>
-		`[NOTE] Some previous conversation history with the user has been removed to maintain optimal context window length. The initial user task and the most recent exchanges have been retained for continuity, while intermediate conversation history has been removed. Please keep this in mind as you continue assisting the user.`,
+		`[注意] 为保持上下文窗口的最佳长度，部分与用户的历史对话已被移除。已保留最初的用户任务和最近的交互，以确保连贯性，请在继续协助用户时注意这一点。`,
 
 	condense: () =>
-		`The user has accepted the condensed conversation summary you generated. This summary covers important details of the historical conversation with the user which has been truncated.\n<explicit_instructions type="condense_response">It's crucial that you respond by ONLY asking the user what you should work on next. You should NOT take any initiative or make any assumptions about continuing with work. For example you should NOT suggest file changes or attempt to read any files.\nWhen asking the user what you should work on next, you can reference information in the summary which was just generated. However, you should NOT reference information outside of what's contained in the summary for this response. Keep this response CONCISE.</explicit_instructions>`,
+		`用户已接受你生成的精简对话摘要。该摘要涵盖了与用户的历史对话中的重要细节，以下内容已被截断。\n<explicit_instructions type="condense_response">在接下来的回复中，你只需询问用户下一步该做什么。不要主动提出或假设要继续的工作，也不要建议修改文件或再次读取文件。\n在询问用户下一步要做什么时，可以参考刚才摘要中的信息，但不要引用摘要之外的任何内容。请保持回复简洁。</explicit_instructions>`,
 
-	toolDenied: () => `The user denied this operation.`,
+	toolDenied: () => `用户已拒绝此操作。`,
 
 	toolDeniedWithFeedback: (feedback?: string) =>
-		`The user denied this operation and provided the following feedback:\n<feedback>\n${feedback}\n</feedback>`,
+		`用户已拒绝此操作，并提供了以下反馈：\n<feedback>\n${feedback}\n</feedback>`,
 
 	toolApprovedWithFeedback: (feedback?: string) =>
-		`The user approved this operation and provided the following context:\n<feedback>\n${feedback}\n</feedback>`,
+		`用户已批准此操作，并提供了以下上下文信息：\n<feedback>\n${feedback}\n</feedback>`,
 
-	toolError: (error?: string) => `The tool execution failed with the following error:\n<error>\n${error}\n</error>`,
+	toolError: (error?: string) => `工具执行失败，错误信息如下：\n<error>\n${error}\n</error>`,
 
 	rooIgnoreError: (path: string) =>
-		`Access to ${path} is blocked by the .kilocodeignore file settings. You must try to continue in the task without using this file, or ask the user to update the .kilocodeignore file.`,
+		`因 .kilocodeignore 文件设置，无法访问路径 ${path}。请在不使用该文件的情况下继续任务，或请用户更新 .kilocodeignore 设置。`,
 
 	noToolsUsed: () =>
-		`[ERROR] You did not use a tool in your previous response! Please retry with a tool use.
+		`[错误] 你在上一次回复中没有使用任何工具！请重新使用工具调用格式后再试。
 
 ${toolUseInstructionsReminder}
 
-# Next Steps
-
-If you have completed the user's task, use the attempt_completion tool.
-If you require additional information from the user, use the ask_followup_question tool.
-Otherwise, if you have not completed the task and do not need additional information, then proceed with the next step of the task.
-(This is an automated message, so do not respond to it conversationally.)`,
+# 后续步骤
+	•	如果你已完成用户的任务，请使用 <attempt_completion> 工具。
+	•	如果你需要向用户获取更多信息，请使用 <ask_followup_question> 工具。
+	•	否则，如果你尚未完成任务且不需要额外信息，请继续执行任务的下一步。
+（这是自动消息，请勿以对话形式回复。）`,
 
 	tooManyMistakes: (feedback?: string) =>
-		`You seem to be having trouble proceeding. The user has provided the following feedback to help guide you:\n<feedback>\n${feedback}\n</feedback>`,
+		`看起来你在执行过程中遇到了困难。用户提供了以下反馈来帮助你:\n<feedback>\n${feedback}\n</feedback>`,
 
 	missingToolParameterError: (paramName: string) =>
-		`Missing value for required parameter '${paramName}'. Please retry with complete response.\n\n${toolUseInstructionsReminder}`,
+		`缺少必需参数 ${paramName} 的值。请提供完整的响应后重试.\n\n${toolUseInstructionsReminder}`,
 
 	lineCountTruncationError: (actualLineCount: number, isNewFile: boolean, diffStrategyEnabled: boolean = false) => {
-		const truncationMessage = `Note: Your response may have been truncated because it exceeded your output limit. You wrote ${actualLineCount} lines of content, but the line_count parameter was either missing or not included in your response.`
+		const truncationMessage = `注意：你的回复可能因超出输出限制而被截断。你共写了 ${actualLineCount} 行内容，但响应中缺少或未包含 line_count 参数.`
 
 		const newFileGuidance =
-			`This appears to be a new file.\n` +
+			`这似乎是一个新文件。\n` +
 			`${truncationMessage}\n\n` +
 			`RECOMMENDED APPROACH:\n` +
-			`1. Try again with the line_count parameter in your response if you forgot to include it\n` +
-			`2. Or break your content into smaller chunks - first use write_to_file with the initial chunk\n` +
-			`3. Then use insert_content to append additional chunks\n`
+			`1. 如果忘记包含 line_count 参数，请在响应中重试并添加该参数\n` +
+			`2. 或将内容拆分成更小的块 —— 首先使用 write_to_file 写入初始部分\n` +
+			`3. 然后使用 insert_content 附加剩余内容块\n`
 
-		let existingFileApproaches = [
-			`1. Try again with the line_count parameter in your response if you forgot to include it`,
-		]
+		let existingFileApproaches = [`1. 如果忘记包含 line_count 参数，请在响应中重试并添加该参数`]
 
 		if (diffStrategyEnabled) {
-			existingFileApproaches.push(`2. Or try using apply_diff instead of write_to_file for targeted changes`)
+			existingFileApproaches.push(`2. 或者尝试使用 apply_diff 来进行有针对性的修改，而不是 write_to_file`)
 		}
 
 		existingFileApproaches.push(
-			`${diffStrategyEnabled ? "3" : "2"}. Or use search_and_replace for specific text replacements`,
-			`${diffStrategyEnabled ? "4" : "3"}. Or use insert_content to add specific content at particular lines`,
+			`${diffStrategyEnabled ? "3" : "2"}. 或使用 search_and_replace 进行特定文本替换`,
+			`${diffStrategyEnabled ? "4" : "3"}. 或使用 insert_content 在特定行插入内容`,
 		)
 
 		const existingFileGuidance =
-			`This appears to be content for an existing file.\n` +
+			`这似乎是现有文件的内容.\n` +
 			`${truncationMessage}\n\n` +
 			`RECOMMENDED APPROACH:\n` +
 			`${existingFileApproaches.join("\n")}\n`
@@ -199,22 +196,22 @@ const formatImagesIntoBlocks = (images?: string[]): Anthropic.ImageBlockParam[] 
 		: []
 }
 
-const toolUseInstructionsReminder = `# Reminder: Instructions for Tool Use
+const toolUseInstructionsReminder = `# 提醒：工具使用说明
 
-Tool uses are formatted using XML-style tags. The tool name itself becomes the XML tag name. Each parameter is enclosed within its own set of tags. Here's the structure:
+工具调用使用 XML 风格标签格式。工具名称即标签名称，每个参数用其自己的标签包裹。结构如下：
 
-<actual_tool_name>
-<parameter1_name>value1</parameter1_name>
-<parameter2_name>value2</parameter2_name>
-...
-</actual_tool_name>
+<工具名称>
+<参数1名称>值1</参数1名称>
+<参数2名称>值2</参数2名称>
+…
+</工具名称>
 
-For example, to use the attempt_completion tool:
+例如，要调用 attempt_completion 工具：
 
 <attempt_completion>
 <result>
-I have completed the task...
+我已完成该任务…
 </result>
 </attempt_completion>
 
-Always use the actual tool name as the XML tag name for proper parsing and execution.`
+务必使用正确的工具名称作为 XML 标签名称，以确保能够被正确解析和执行。`

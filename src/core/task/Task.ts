@@ -1015,17 +1015,26 @@ export class Task extends EventEmitter<ClineEvents> {
 
 		const wasRecent = lastClineMessage?.ts && Date.now() - lastClineMessage.ts < 30_000
 
+		// newUserContent.push({
+		// 	type: "text",
+		// 	text:
+		// 		`[TASK RESUMPTION] This task was interrupted ${agoText}. It may or may not be complete, so please reassess the task context. Be aware that the project state may have changed since then. If the task has not been completed, retry the last step before interruption and proceed with completing the task.\n\nNote: If you previously attempted a tool use that the user did not provide a result for, you should assume the tool use was not successful and assess whether you should retry. If the last tool was a browser_action, the browser has been closed and you must launch a new browser if needed.${
+		// 			wasRecent
+		// 				? "\n\nIMPORTANT: If the last tool use was a write_to_file that was interrupted, the file was reverted back to its original state before the interrupted edit, and you do NOT need to re-read the file as you already have its up-to-date contents."
+		// 				: ""
+		// 		}` +
+		// 		(responseText
+		// 			? `\n\nNew instructions for task continuation:\n<user_message>\n${responseText}\n</user_message>`
+		// 			: ""),
+		// })
 		newUserContent.push({
 			type: "text",
 			text:
-				`[TASK RESUMPTION] This task was interrupted ${agoText}. It may or may not be complete, so please reassess the task context. Be aware that the project state may have changed since then. If the task has not been completed, retry the last step before interruption and proceed with completing the task.\n\nNote: If you previously attempted a tool use that the user did not provide a result for, you should assume the tool use was not successful and assess whether you should retry. If the last tool was a browser_action, the browser has been closed and you must launch a new browser if needed.${
+				`[任务恢复] 此任务在 ${agoText} 被中断。任务可能已完成，也可能尚未完成，请重新评估任务上下文。请注意，自那时起项目状态可能已发生变化。如果任务尚未完成，请重试中断前的最后一步并继续完成任务。\n\n注意：如果你之前尝试使用某个工具但用户未提供结果，则应假定该工具调用未成功，并评估是否需要重试。如果上一个工具是 browser_action，则浏览器已关闭，需要重新启动浏览器以继续。${
 					wasRecent
-						? "\n\nIMPORTANT: If the last tool use was a write_to_file that was interrupted, the file was reverted back to its original state before the interrupted edit, and you do NOT need to re-read the file as you already have its up-to-date contents."
+						? "\n\n重要提示：如果上一个工具调用是被中断的 write_to_file 操作，则该文件已恢复到中断编辑前的原始状态，无需重新读取文件，因为你已拥有最新内容。"
 						: ""
-				}` +
-				(responseText
-					? `\n\nNew instructions for task continuation:\n<user_message>\n${responseText}\n</user_message>`
-					: ""),
+				}` + (responseText ? `\n\n新的任务继续指令：\n<user_message>\n${responseText}\n</user_message>` : ""),
 		})
 
 		if (responseImages && responseImages.length > 0) {
@@ -1585,7 +1594,7 @@ export class Task extends EventEmitter<ClineEvents> {
 				// an error.
 				await this.say(
 					"error",
-					"Unexpected API Response: The language model did not provide any assistant messages. This may indicate an issue with the API or the model's output.",
+					"意外的 API 响应：语言模型未返回任何助手消息。这可能表示 API 或模型的输出出现问题。",
 				)
 
 				await this.addToApiConversationHistory({
