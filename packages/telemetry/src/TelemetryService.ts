@@ -8,22 +8,27 @@ import { type TelemetryClient, type TelemetryPropertiesProvider, TelemetryEventN
  * variables are loaded.
  */
 export class TelemetryService {
-	constructor(private clients: TelemetryClient[]) {}
+        private provider?: TelemetryPropertiesProvider
 
-	public register(client: TelemetryClient): void {
-		this.clients.push(client)
-	}
+        constructor(private clients: TelemetryClient[]) {}
+
+        public register(client: TelemetryClient): void {
+                this.clients.push(client)
+                if (this.provider) {
+                        client.setProvider(this.provider)
+                }
+        }
 
 	/**
 	 * Sets the ClineProvider reference to use for global properties
 	 * @param provider A ClineProvider instance to use
 	 */
-	public setProvider(provider: TelemetryPropertiesProvider): void {
-		// If client is initialized, pass the provider reference.
-		if (this.isReady) {
-			this.clients.forEach((client) => client.setProvider(provider))
-		}
-	}
+        public setProvider(provider: TelemetryPropertiesProvider): void {
+                this.provider = provider
+                if (this.isReady) {
+                        this.clients.forEach((client) => client.setProvider(provider))
+                }
+        }
 
 	/**
 	 * Base method for all telemetry operations
@@ -246,13 +251,13 @@ export class TelemetryService {
 		return this.isReady && this.clients.some((client) => client.isTelemetryEnabled())
 	}
 
-	public async shutdown(): Promise<void> {
-		if (!this.isReady) {
-			return
-		}
+        public async shutdown(): Promise<void> {
+                if (!this.isReady) {
+                        return
+                }
 
-		this.clients.forEach((client) => client.shutdown())
-	}
+                await Promise.all(this.clients.map((client) => client.shutdown()))
+        }
 
 	private static _instance: TelemetryService | null = null
 
